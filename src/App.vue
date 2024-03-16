@@ -22,8 +22,11 @@
     <button @click="nextQuestion">Next</button>
   </div>
   <div v-else>
-    <h2>Thank you for completing the questionnaire!</h2>
-    <p>Your result: {{ result }}</p>
+    <h2>Поздравляю! Вы прошли вопрос на проф-определение</h2>
+    <p style="margin-top: 100px; margin-bottom: 100px">
+      Ваш результат: <br />
+      {{ result }}
+    </p>
   </div>
 </template>
 
@@ -211,7 +214,13 @@ export default {
       // Массив для хранения ответов пользователя
       currentQuestionIndex: 0,
       selectedOption: null,
-      result: null
+      result: null,
+      counts: {
+        a: 0,
+        b: 0,
+        c: 0,
+        d: 0
+      }
     }
   },
   computed: {
@@ -222,40 +231,43 @@ export default {
   methods: {
     nextQuestion() {
       if (this.selectedOption !== null) {
+        this.counts[this.selectedOption]++
         if (this.currentQuestionIndex < this.questions.length - 1) {
           this.currentQuestionIndex++
           this.selectedOption = null
         } else {
+          this.currentQuestionIndex++
           this.calculateResult()
         }
       }
     },
     // Метод для подсчета результатов
-    calculateResults() {
-      // Подсчитываем количество ответов каждого типа
-      const counts = { a: 0, b: 0, c: 0, d: 0 }
-      this.answers.forEach((answer) => {
-        counts[answer]++
-      })
-      // Определяем тип с максимальным количеством ответов
-      const maxCount = Math.max(...Object.values(counts))
-      let result = ''
-      // Выводим результат в зависимости от наибольшего количества ответов
-      if (maxCount === counts.a) {
-        result =
-          'Тип "a": Это может указывать на предпочтение творческих и нестандартных видов работы, где требуется оригинальный подход и готовность к постоянным изменениям.'
-      } else if (maxCount === counts.b) {
-        result =
-          'Тип "b": Это может свидетельствовать о склонности к аналитическому мышлению, структурированию и выполнению конкретных задач, где требуется логика и системность.'
-      } else if (maxCount === counts.c) {
-        result =
-          'Тип "c": Это указывает на интерес к взаимодействию с людьми, работе в коллективе и умению общаться, что может подталкивать к выбору профессии, связанной с социальными аспектами и межличностными отношениями.'
-      } else if (maxCount === counts.d) {
-        result =
-          'Тип "d": Это может свидетельствовать о склонности к монотонным видам работы, где требуется выполнение рутинных задач и усидчивость.'
+    calculateResult() {
+      if (
+        this.counts.a > this.counts.b &&
+        this.counts.a > this.counts.c &&
+        this.counts.a > this.counts.d
+      ) {
+        this.result =
+          'предпочтение творческих и нестандартных видов работы, где требуется оригинальный подход и готовность к постоянным изменениям.'
+      } else if (
+        this.counts.b > this.counts.a &&
+        this.counts.b > this.counts.c &&
+        this.counts.b > this.counts.d
+      ) {
+        this.result =
+          'склонность к аналитическому мышлению, структурированию и выполнению конкретных задач, где требуется логика и системность.'
+      } else if (
+        this.counts.c > this.counts.a &&
+        this.counts.c > this.counts.b &&
+        this.counts.c > this.counts.d
+      ) {
+        this.result =
+          'интерес к взаимодействию с людьми, работе в коллективе и умению общаться, что может подталкивать вас к выбору профессии, связанной с социальными аспектами и межличностными отношениями.'
+      } else {
+        this.result =
+          'склонность к монотонным видам работы, где требуется выполнение рутинных задач и усидчивость.'
       }
-      // Устанавливаем результат
-      this.result = result
     }
   }
 }
